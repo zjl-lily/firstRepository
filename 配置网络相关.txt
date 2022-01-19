@@ -1,0 +1,72 @@
+
+一、网络配置相关
+1.ifconfig  eth*  IP地址   netmask  255.255.255.0
+2.添加网关：
+	route add default gw 192.168.1.1(路由器的网关)
+3.检测网关是否添加
+	route -n
+4.添加DNS
+创建文件： /etc/resolv.conf  
+在文件中添加：
+	nameserver 233.5.5.5 //DNS1
+	nameserver 233.6.6.6  // DNS2
+其中DNS可以通过电脑，在cmd中，输入 ipconfig 查看
+
+eth4、eth5对应syn0、syn1 
+
+如果需要加电后自动配置，需要改写 /etc/network 下的 interfaces 文件
+内容如下：
+
+auto lo
+iface lo inet loopback
+
+# auto eth0
+#  iface eth0 inet dhcp  // 动态IP
+#   pre-up /etc/network/nfs_check
+#   wait-delay 15
+#   hostname $(hostname)
+auto eth5   // eth5 设备名
+iface eth5 inet static  // 静态IP
+  address  192.168.1.120
+  netmask  255.255.255.0
+#  network  192.168.1.0
+#  Bcask  192.168.1.255
+  gateway  192.168.1.1
+  dns-nameservers  192.168.1.1  8.8.8.8
+
+
+
+二、串口测试：
+配置波特率：
+stty  -F /dev/ttyS*  ispeed 115200  ospeed  115200  cs8
+
+发送数据：
+echo  "xxx" > /dev/ttyS*
+
+接收数据：
+cat /dev/ttyS*
+
+三、下载文件
+tftp 服务  
+客户端：龙芯板卡
+1.下载文件：tftp -g -r a1 192.168.1.111
+
+-g:下载文件
+-p:上传文件
+-l: 客户端文件，后跟需要上传的客户端文件名或者下载后另存的文件名
+-r: remote缩写，后跟server（tftp服务器）的源文件名，或上传server后重命名的文件名 
+ 
+192.168.1.111：tftp服务器的IP
+
+2.上传文件
+tftp -p -r b.c 192.168.1.111
+
+3.上传本地文件a3,服务器端改名为b3
+tftp -p -l a3 -r b3 192.168.1.111
+
+4.下载服务器端文件a1.c,本地另存为b1.c
+tftp -g -l b1.c -r a1.c 192.168.1.111
+
+下载的文件存在当前目录。
+
+四、
